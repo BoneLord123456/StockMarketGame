@@ -1,1 +1,1 @@
-{"username":"Boni123456","password":"priyoM14721#","balance":14.100000000000001,"begCooldownEndTime":1723525166925,"stocks":{"candy":6,"chocolates":0,"earphones":0,"phones":0,"laptops":0,"bitcoins":0,"gold":0,"diamond":0}}
+{"username":"Boni123456","password":"priyoM14721#","balance":16,"stocks":{"candy":null}}
