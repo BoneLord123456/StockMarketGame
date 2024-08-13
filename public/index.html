@@ -5,42 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main Menu - Stock Market Game</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            background-color: #f8f9fa;
-            margin: 0;
-        }
-        .container {
-            width: 80%;
-            margin: auto;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 50px;
-            position: relative;
-            border-radius: 8px;
-        }
-        #username {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        button {
-            padding: 15px 30px;
-            margin: 20px;
-            cursor: pointer;
-            font-size: 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f8f9fa; margin: 0; }
+        .container { width: 80%; margin: auto; padding: 20px; background-color: white; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); margin-top: 50px; position: relative; border-radius: 8px; }
+        #username { position: absolute; top: 10px; left: 10px; font-size: 18px; font-weight: bold; }
+        button { padding: 15px 30px; margin: 20px; cursor: pointer; font-size: 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background-color: #0056b3; }
     </style>
 </head>
 <body>
@@ -49,46 +18,27 @@
         <h1>Welcome to the Stock Market Game</h1>
         <p>Your balance: $<span id="balance">0</span></p>
         <button onclick="window.location.href='shop.html'">Shop</button>
-        <button id="begButton" onclick="beg()">Beg for Money</button>
+        <button onclick="logout()">Logout</button>
     </div>
 
     <script>
-        let balance = 0;
-
         async function fetchUserData() {
             try {
                 const response = await fetch('/user-data');
                 const data = await response.json();
-
                 if (data.username) {
                     document.getElementById('userName').innerText = data.username;
-                    balance = data.balance || 0;
-                    updateBalance();
+                    document.getElementById('balance').innerText = data.balance.toFixed(2);
                 }
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
         }
 
-        function updateBalance() {
-            document.getElementById('balance').innerText = balance.toFixed(2);
+        function logout() {
+            window.location.href = '/logout';
         }
 
-        function beg() {
-            const begAmount = (Math.random() * (1 - 0.01) + 0.01).toFixed(2); // Random amount between $0.01 and $1
-            balance += parseFloat(begAmount);
-            alert(`You begged and received $${begAmount}`);
-            updateBalance();
-
-            // Save the updated balance
-            fetch('/user-data', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ balance })
-            });
-        }
-
-        // Load user data on page load
         fetchUserData();
     </script>
 </body>
