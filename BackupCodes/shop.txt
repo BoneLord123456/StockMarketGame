@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - Stock Market Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+            position: relative;
+            border-radius: 8px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #backButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 10px 15px;
+        }
+        #stockMarket div {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button id="backButton" onclick="saveAndGoBack()">Back to Main Menu</button>
+        <h1>Stock Market</h1>
+        <p>Your balance: $<span id="balance">0</span></p>
+        
+        <div id="stockMarket">
+            <div>
+                <p>Candy: $<span id="price-candy"></span> | Owned: <span id="owned-candy">0</span></p>
+                <button onclick="promptBuyItem('candy')">Buy Candy</button>
+                <button onclick="promptSellItem('candy')">Sell Candy</button>
+            </div>
+            <div>
+                <p>Chocolates: $<span id="price-chocolates"></span> | Owned: <span id="owned-chocolates">0</span></p>
+                <button onclick="promptBuyItem('chocolates')">Buy Chocolates</button>
+                <button onclick="promptSellItem('chocolates')">Sell Chocolates</button>
+            </div>
+            <div>
+                <p>Earphones: $<span id="price-earphones"></span> | Owned: <span id="owned-earphones">0</span></p>
+                <button onclick="promptBuyItem('earphones')">Buy Earphones</button>
+                <button onclick="promptSellItem('earphones')">Sell Earphones</button>
+            </div>
+            <div>
+                <p>Phones: $<span id="price-phones"></span> | Owned: <span id="owned-phones">0</span></p>
+                <button onclick="promptBuyItem('phones')">Buy Phones</button>
+                <button onclick="promptSellItem('phones')">Sell Phones</button>
+            </div>
+            <div>
+                <p>Laptops: $<span id="price-laptops"></span> | Owned: <span id="owned-laptops">0</span></p>
+                <button onclick="promptBuyItem('laptops')">Buy Laptops</button>
+                <button onclick="promptSellItem('laptops')">Sell Laptops</button>
+            </div>
+            <div>
+                <p>Bitcoins: $<span id="price-bitcoins"></span> | Owned: <span id="owned-bitcoins">0</span></p>
+                <button onclick="promptBuyItem('bitcoins')">Buy Bitcoins</button>
+                <button onclick="promptSellItem('bitcoins')">Sell Bitcoins</button>
+            </div>
+            <div>
+                <p>Gold: $<span id="price-gold"></span> | Owned: <span id="owned-gold">0</span></p>
+                <button onclick="promptBuyItem('gold')">Buy Gold</button>
+                <button onclick="promptSellItem('gold')">Sell Gold</button>
+            </div>
+            <div>
+                <p>Diamond: $<span id="price-diamond"></span> | Owned: <span id="owned-diamond">0</span></p>
+                <button onclick="promptBuyItem('diamond')">Buy Diamond</button>
+                <button onclick="promptSellItem('diamond')">Sell Diamond</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let balance = 0;
+        let stocks = {
+            candy: 0,
+            chocolates: 0,
+            earphones: 0,
+            phones: 0,
+            laptops: 0,
+            bitcoins: 0,
+            gold: 0,
+            diamond: 0
+        };
+        let prices = {
+            candy: { min: 5, max: 10, current: 7 },
+            chocolates: { min: 50, max: 100, current: 75 },
+            earphones: { min: 500, max: 2000, current: 1500 },
+            phones: { min: 4000, max: 10000, current: 7000 },
+            laptops: { min: 30000, max: 50000, current: 40000 },
+            bitcoins: { min: 300000, max: 800000, current: 500000 },
+            gold: { min: 50000, max: 2000000, current: 1000000 },
+            diamond: { min: 5000000, max: 20000000, current: 10000000 }
+        };
+
+        async function fetchUserData() {
+            try {
+                const response = await fetch('/user-data');
+                const data = await response.json();
+
+                if (data.username) {
+                    balance = data.balance || 0;
+                    stocks = data.stocks || stocks;
+                    updateUI();
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('balance').innerText = balance.toFixed(2);
+            for (let item in stocks) {
+                document.getElementById(`owned-${item}`).innerText = stocks[item];
+            }
+            for (let item in prices) {
+                document.getElementById(`price-${item}`).innerText = prices[item].current;
+            }
+        }
+
+        function promptBuyItem(item) {
+            const quantity = parseInt(prompt(`How many ${item} would you like to buy?`));
+            if (isNaN(quantity) || quantity <= 0) {
+                alert("Invalid quantity.");
+                return;
+            }
+            buyItem(item, quantity);
+        }
+
+        function promptSellItem(item) {
+            const quantity = parseInt(prompt(`How many ${item} would you like to sell?`));
+            if (isNaN(quantity) || quantity <= 0) {
+                alert("Invalid quantity.");
+                return;
+            }
+            sellItem(item, quantity);
+        }
+
+        function buyItem(item, quantity) {
+            const price = prices[item].current;
+            const totalCost = price * quantity;
+
+            if (balance >= totalCost) {
+                balance -= totalCost;
+                stocks[item] += quantity;
+                alert(`You bought ${quantity} ${item} for $${totalCost.toFixed(2)}`);
+            } else {
+                alert("Not enough money!");
+            }
+            updateUI();
+        }
+
+        function sellItem(item, quantity) {
+            if (stocks[item] >= quantity) {
+                const price = prices[item].current;
+                const totalGain = price * quantity;
+
+                balance += totalGain;
+                stocks[item] -= quantity;
+                alert(`You sold ${quantity} ${item} for $${totalGain.toFixed(2)}`);
+            } else {
+                alert("You don't own enough of this item to sell!");
+            }
+            updateUI();
+        }
+
+        async function saveAndGoBack() {
+            await fetch('/user-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ balance, stocks })
+            });
+            window.location.href = 'index.html';
+        }
+
+        // Load user data on page load
+        window.onload = function () {
+            fetchUserData();
+            setInterval(() => {
+                for (let item in prices) {
+                    prices[item].current = Math.floor(Math.random() * (prices[item].max - prices[item].min + 1)) + prices[item].min;
+                }
+                updateUI();
+            }, 300 * 1000); // Update prices every 5 minutes
+        };
+    </script>
+</body>
+</html>
