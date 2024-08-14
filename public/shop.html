@@ -5,43 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop - Stock Market Game</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            background-color: #f8f9fa;
-            margin: 0;
-        }
-        .container {
-            width: 80%;
-            margin: auto;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 50px;
-            position: relative;
-            border-radius: 8px;
-        }
-        button {
-            padding: 10px 20px;
-            margin: 5px;
-            cursor: pointer;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #backButton {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 10px 15px;
-        }
-        #stockMarket div {
-            margin: 20px 0;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f8f9fa; margin: 0; }
+        .container { width: 80%; margin: auto; padding: 20px; background-color: white; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); margin-top: 50px; position: relative; border-radius: 8px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background-color: #0056b3; }
+        #backButton { position: absolute; top: 10px; right: 10px; padding: 10px 15px; }
+        #stockMarket div { margin: 20px 0; }
     </style>
 </head>
 <body>
@@ -189,11 +158,20 @@
         }
 
         async function saveAndGoBack() {
-            await fetch('/user-data', {
+            console.log("Saving data:", { balance, stocks });  // Debug: Print data before sending
+
+            const response = await fetch('/user-data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ balance, stocks })
             });
+
+            if (response.ok) {
+                console.log("Data saved successfully!");
+            } else {
+                console.error("Error saving data:", response.statusText);
+            }
+
             window.location.href = 'index.html';
         }
 

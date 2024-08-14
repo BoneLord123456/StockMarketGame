@@ -1,1 +1,15 @@
-{"username":"Boni123456","password":"priyoM14721#","balance":16,"stocks":{"candy":null}}
+{
+  "username": "Boni123456",
+  "password": "priyoM14721#",
+  "balance": 2000.3899999999994,
+  "stocks": {
+    "candy": 4,
+    "chocolates": 1,
+    "earphones": 12,
+    "phones": 0,
+    "laptops": 2,
+    "bitcoins": 0,
+    "gold": 0,
+    "diamond": 0
+  }
+}

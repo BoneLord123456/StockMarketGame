@@ -1,10 +1,10 @@
-const express = require('express');  // Make sure this is at the top
+const express = require('express');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const fs = require('fs');
 const path = require('path');
 
-const app = express();  // Make sure this comes immediately after requiring express
+const app = express();
 const port = process.env.PORT || 3000;
 const usersDir = path.join(__dirname, 'users');
 
@@ -29,7 +29,12 @@ function readUserData(username) {
     const filePath = path.join(usersDir, `${username}.txt`);
     if (fs.existsSync(filePath)) {
         const data = fs.readFileSync(filePath, 'utf8');
-        return JSON.parse(data);
+        const parsedData = JSON.parse(data);
+
+        // Ensure all stocks are initialized
+        parsedData.stocks = initializeStocks(parsedData.stocks);
+
+        return parsedData;
     }
     return null;
 }
@@ -37,7 +42,24 @@ function readUserData(username) {
 // Function to write user data to a file
 function writeUserData(username, data) {
     const filePath = path.join(usersDir, `${username}.txt`);
-    fs.writeFileSync(filePath, JSON.stringify(data));
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2)); // Pretty print JSON
+}
+
+// Function to initialize stocks with default values
+function initializeStocks(stocks) {
+    const defaultStocks = {
+        candy: 0,
+        chocolates: 0,
+        earphones: 0,
+        phones: 0,
+        laptops: 0,
+        bitcoins: 0,
+        gold: 0,
+        diamond: 0
+    };
+
+    // Merge existing stocks with default stocks
+    return { ...defaultStocks, ...stocks };
 }
 
 // Route to serve the main index page
@@ -57,7 +79,13 @@ app.post('/signup', (req, res) => {
         return res.send('Username already exists. Please <a href="/signup.html">try again</a>.');
     }
 
-    const userData = { username, password, balance: 100, stocks: {} };
+    const userData = {
+        username,
+        password,
+        balance: 100,
+        stocks: initializeStocks({})
+    }; // Initialize stocks with default values
+
     writeUserData(username, userData);
     req.session.user = userData;
     res.redirect('/');
@@ -90,9 +118,16 @@ app.post('/user-data', (req, res) => {
     }
 
     const { balance, stocks } = req.body;
+
+    console.log("Received stocks:", stocks);  // Debug: Print received stocks
+
     req.session.user.balance = balance;
-    req.session.user.stocks = stocks;
+    req.session.user.stocks = initializeStocks(stocks);  // Update stocks in session
+
     writeUserData(req.session.user.username, req.session.user);
+
+    console.log("Updated user data saved:", req.session.user);  // Debug: Print saved user data
+
     res.json({ success: true });
 });
 

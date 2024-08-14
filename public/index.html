@@ -25,6 +25,16 @@
 
     <script>
         let balance = 0;
+        let stocks = {
+            candy: 0,
+            chocolates: 0,
+            earphones: 0,
+            phones: 0,
+            laptops: 0,
+            bitcoins: 0,
+            gold: 0,
+            diamond: 0
+        };
 
         async function fetchUserData() {
             try {
@@ -33,6 +43,7 @@
                 if (data.username) {
                     document.getElementById('userName').innerText = data.username;
                     balance = data.balance || 0;
+                    stocks = data.stocks || stocks;
                     document.getElementById('balance').innerText = balance.toFixed(2);
                 }
             } catch (error) {
@@ -44,17 +55,22 @@
             window.location.href = '/logout';
         }
 
-        function beg() {
+        async function beg() {
             const begAmount = (Math.random() * (1 - 0.01) + 0.01).toFixed(2);
             balance += parseFloat(begAmount);
             alert(`You begged and received $${begAmount}`);
             document.getElementById('balance').innerText = balance.toFixed(2);
 
-            fetch('/user-data', {
+            // Save the updated balance while keeping the stocks intact
+            const response = await fetch('/user-data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ balance })
+                body: JSON.stringify({ balance, stocks })
             });
+
+            if (!response.ok) {
+                console.error("Error saving data:", response.statusText);
+            }
         }
 
         fetchUserData();

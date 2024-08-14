@@ -118,16 +118,9 @@ app.post('/user-data', (req, res) => {
     }
 
     const { balance, stocks } = req.body;
-
-    console.log("Received stocks:", stocks);  // Debug: Print received stocks
-
     req.session.user.balance = balance;
-    req.session.user.stocks = initializeStocks(stocks);  // Update stocks in session
-
+    req.session.user.stocks = initializeStocks(stocks);
     writeUserData(req.session.user.username, req.session.user);
-
-    console.log("Updated user data saved:", req.session.user);  // Debug: Print saved user data
-
     res.json({ success: true });
 });
 
